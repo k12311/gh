@@ -1,360 +1,601 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>第1課：韓文單字練習</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>第1課：韓文單字＋例句朗讀（iPhone 自動輪播版，黃色系）</title>
   <style>
-    body { background: #fff0f5; font-family: Arial; padding: 2rem; }
-    h1 { text-align: center; color: #d26fa0; }
-    table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 0 12px #e3a5c7; }
-    th, td { padding: 1rem; border-bottom: 1px solid #f8cde8; vertical-align: top; }
-    th { background: #ffe0ec; color: #b7448c; }
-    button { background: #ffc0cb; border: none; padding: 6px 12px; border-radius: 8px; margin: 5px 4px 0 0; cursor: pointer; }
-    button:hover { background: #ffa7bd; }
-    .home-link {
-      display: inline-block;
-      background-color: #ffc0cb;
-      color: #333;
-      text-decoration: none;
-      padding: 0.6rem 1.2rem;
-      border-radius: 10px;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-      margin-top: 2rem;
+    :root{
+      --yellow:#fff8d5;        /* 背景主色 */
+      --yellow-2:#fff3b0;      /* 元件底色 */
+      --yellow-dark:#ffe97a;   /* hover */
+      --orange:#d9983d;        /* 標題、強調 */
     }
-    .home-link:hover { background-color: #ffa7bd; }
-    .center { text-align: center; }
+    body{background:var(--yellow);font-family:Arial, 'Noto Sans KR', sans-serif;color:#333;padding:2rem;}
+    h1{text-align:center;color:var(--orange);margin-bottom:0.5rem}
+    .sub{color:#555;text-align:center;margin-bottom:1rem}
+    .panel{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;margin:1rem 0 1.2rem}
+    .panel button,.panel input[type="range"],.home-link{
+      background:var(--yellow-2);
+      border:none;padding:.6rem 1rem;border-radius:10px;
+      box-shadow:0 3px 6px rgba(0,0,0,.1);
+      cursor:pointer;color:#333;
+    }
+    .panel button:hover,.home-link:hover{background:var(--yellow-dark)}
+    .panel small{display:block;margin-top:.25rem;color:#666;text-align:center}
+    .status{font-size:.95rem;color:#2b7a0b}
+
+    table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 0 12px rgba(227,165,199,.8)}
+    th,td{padding:1rem;border-bottom:1px solid #f8e6b8;vertical-align:top;text-align:left}
+    th{background:var(--yellow-2);color:var(--orange)}
+    td .btn{background:var(--yellow-2);border:none;padding:6px 12px;border-radius:8px;margin:5px 4px 0 0;cursor:pointer;color:#333}
+    td .btn:hover{background:var(--yellow-dark)}
+    .flex-center{text-align:center}
+    .muted{color:#666;font-size:.9rem}
+
+    @media (max-width: 720px){
+      table{font-size:.95rem}
+      td{word-break:keep-all}
+      .panel{gap:.5rem}
+    }
   </style>
 </head>
 <body>
-  <h1>第1課：韓文單字＋例句練習</h1>
-  <table>
-    <thead><tr><th>單字</th><th>中文意思</th><th>例句與朗讀</th></tr></thead>
+  <h1>第1課：韓文單字＋例句朗讀</h1>
+  <p class="sub">支援 iPhone：先點 <b>🔓 啟動語音</b>。含 <b>自動輪播（單字→例句→停 0.8 秒）</b>、本行播放、全課播放。</p>
+
+  <div class="panel flex-center">
+    <button id="unlockTTS">🔓 啟動語音（iPhone 需先點一次）</button>
+    <button id="playAll">▶️ 全課播放</button>
+    <button id="autoRun">🔁 自動輪播（單字→例句）</button>
+    <button id="stopAll">⏹ 停止播放</button>
+    <label style="display:flex;align-items:center;gap:.5rem;background:transparent;box-shadow:none;cursor:default">
+      <span>語速</span>
+      <input id="rate" type="range" min="0.8" max="1.2" step="0.05" value="0.95" />
+    </label>
+    <button id="diag">🧪 語音診斷</button>
+    <span id="status" class="status"></span>
+  </div>
+
+  <table id="vocab">
+    <thead>
+      <tr><th>單字</th><th>中文意思</th><th>例句與朗讀</th></tr>
+    </thead>
     <tbody>
-      
       <tr>
         <td>저</td>
         <td>我（謙稱）</td>
         <td>저는 학생입니다. / 我是學生。<br>
-        <button onclick="speak('저')">🔊 單字</button>
-        <button onclick="speak('저는 학생입니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('저')">🔊 單字</button>
+          <button class="btn" onclick="speak('저는 학생입니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>당신</td>
         <td>你（正式或夫妻間使用）</td>
         <td>당신은 선생님입니까? / 你是老師嗎？<br>
-        <button onclick="speak('당신')">🔊 單字</button>
-        <button onclick="speak('당신은 선생님입니까?')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('당신')">🔊 單字</button>
+          <button class="btn" onclick="speak('당신은 선생님입니까?')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>그 사람</td>
         <td>那個人</td>
         <td>그 사람은 의사입니다. / 那個人是醫生。<br>
-        <button onclick="speak('그 사람')">🔊 單字</button>
-        <button onclick="speak('그 사람은 의사입니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('그 사람')">🔊 單字</button>
+          <button class="btn" onclick="speak('그 사람은 의사입니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>그 분</td>
         <td>那位（尊稱）</td>
         <td>그 분은 누구십니까? / 那位是誰？<br>
-        <button onclick="speak('그 분')">🔊 單字</button>
-        <button onclick="speak('그 분은 누구십니까?')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('그 분')">🔊 單字</button>
+          <button class="btn" onclick="speak('그 분은 누구십니까?')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>~씨</td>
         <td>～先生／小姐</td>
         <td>다나카 씨는 선생님입니다. / 田中先生是老師。<br>
-        <button onclick="speak('~씨')">🔊 單字</button>
-        <button onclick="speak('다나카 씨는 선생님입니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('씨')">🔊 單字</button>
+          <button class="btn" onclick="speak('다나카 씨는 선생님입니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>~야 / ~아</td>
         <td>～啊（叫朋友）</td>
         <td>하나야는 아이입니다. / 花花是小孩。<br>
-        <button onclick="speak('~야 / ~아')">🔊 單字</button>
-        <button onclick="speak('하나야는 아이입니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('야')">🔊 單字</button>
+          <button class="btn" onclick="speak('하나야는 아이입니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>~사람</td>
         <td>～人（表示國籍）</td>
         <td>저는 일본 사람입니다. / 我是日本人。<br>
-        <button onclick="speak('~사람')">🔊 單字</button>
-        <button onclick="speak('저는 일본 사람입니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('사람')">🔊 單字</button>
+          <button class="btn" onclick="speak('저는 일본 사람입니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>선생님</td>
         <td>老師（敬語）</td>
         <td>선생님은 일본어 선생님입니다. / 老師是日文老師。<br>
-        <button onclick="speak('선생님')">🔊 單字</button>
-        <button onclick="speak('선생님은 일본어 선생님입니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('선생님')">🔊 單字</button>
+          <button class="btn" onclick="speak('선생님은 일본어 선생님입니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>교사</td>
         <td>教師</td>
         <td>저는 교사입니다. / 我是教師。<br>
-        <button onclick="speak('교사')">🔊 單字</button>
-        <button onclick="speak('저는 교사입니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('교사')">🔊 單字</button>
+          <button class="btn" onclick="speak('저는 교사입니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>학생</td>
         <td>學生</td>
         <td>저는 학생입니다. / 我是學生。<br>
-        <button onclick="speak('학생')">🔊 單字</button>
-        <button onclick="speak('저는 학생입니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('학생')">🔊 單字</button>
+          <button class="btn" onclick="speak('저는 학생입니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>회사원</td>
         <td>上班族</td>
         <td>다나카 씨는 회사원입니다. / 田中先生是公司職員。<br>
-        <button onclick="speak('회사원')">🔊 單字</button>
-        <button onclick="speak('다나카 씨는 회사원입니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('회사원')">🔊 單字</button>
+          <button class="btn" onclick="speak('다나카 씨는 회사원입니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>사원</td>
         <td>職員</td>
         <td>저는 IMC의 사원입니다. / 我是IMC的職員。<br>
-        <button onclick="speak('사원')">🔊 單字</button>
-        <button onclick="speak('저는 IMC의 사원입니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('사원')">🔊 單字</button>
+          <button class="btn" onclick="speak('저는 IMC의 사원입니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>은행원</td>
         <td>銀行職員</td>
         <td>저는 은행원입니다. / 我是銀行員。<br>
-        <button onclick="speak('은행원')">🔊 單字</button>
-        <button onclick="speak('저는 은행원입니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('은행원')">🔊 單字</button>
+          <button class="btn" onclick="speak('저는 은행원입니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>의사</td>
         <td>醫生</td>
         <td>그 사람은 의사입니다. / 那個人是醫生。<br>
-        <button onclick="speak('의사')">🔊 單字</button>
-        <button onclick="speak('그 사람은 의사입니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('의사')">🔊 單字</button>
+          <button class="btn" onclick="speak('그 사람은 의사입니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>연구원</td>
         <td>研究員</td>
         <td>저는 연구원입니다. / 我是研究員。<br>
-        <button onclick="speak('연구원')">🔊 單字</button>
-        <button onclick="speak('저는 연구원입니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('연구원')">🔊 單字</button>
+          <button class="btn" onclick="speak('저는 연구원입니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>대학교</td>
         <td>大學</td>
         <td>저는 대학교에 다닙니다. / 我在大學上學。<br>
-        <button onclick="speak('대학교')">🔊 單字</button>
-        <button onclick="speak('저는 대학교에 다닙니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('대학교')">🔊 單字</button>
+          <button class="btn" onclick="speak('저는 대학교에 다닙니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>병원</td>
         <td>醫院</td>
         <td>병원의 의사입니다. / 我是醫院的醫生。<br>
-        <button onclick="speak('병원')">🔊 單字</button>
-        <button onclick="speak('병원의 의사입니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('병원')">🔊 單字</button>
+          <button class="btn" onclick="speak('병원의 의사입니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>누구</td>
         <td>誰</td>
         <td>그 사람은 누구입니까? / 那個人是誰？<br>
-        <button onclick="speak('누구')">🔊 單字</button>
-        <button onclick="speak('그 사람은 누구입니까?')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('누구')">🔊 單字</button>
+          <button class="btn" onclick="speak('그 사람은 누구입니까?')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>…살</td>
         <td>…歲</td>
         <td>저는 20살입니다. / 我20歲。<br>
-        <button onclick="speak('…살')">🔊 單字</button>
-        <button onclick="speak('저는 20살입니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('살')">🔊 單字</button>
+          <button class="btn" onclick="speak('저는 이십 살입니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>몇 살</td>
         <td>幾歲</td>
         <td>몇 살이에요? / 幾歲？<br>
-        <button onclick="speak('몇 살')">🔊 單字</button>
-        <button onclick="speak('몇 살이에요?')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('몇 살')">🔊 單字</button>
+          <button class="btn" onclick="speak('몇 살이에요?')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>몇 살이세요?</td>
         <td>請問幾歲？（敬語）</td>
         <td>몇 살이세요? / 您幾歲？<br>
-        <button onclick="speak('몇 살이세요?')">🔊 單字</button>
-        <button onclick="speak('몇 살이세요?')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('몇 살이세요?')">🔊 單字</button>
+          <button class="btn" onclick="speak('몇 살이세요?')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>네</td>
         <td>是</td>
         <td>네, 맞습니다. / 是的，沒錯。<br>
-        <button onclick="speak('네')">🔊 單字</button>
-        <button onclick="speak('네, 맞습니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('네')">🔊 單字</button>
+          <button class="btn" onclick="speak('네, 맞습니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>아니요</td>
         <td>不是</td>
         <td>아니요, 아닙니다. / 不，不是。<br>
-        <button onclick="speak('아니요')">🔊 單字</button>
-        <button onclick="speak('아니요, 아닙니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('아니요')">🔊 單字</button>
+          <button class="btn" onclick="speak('아니요, 아닙니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>처음 뵙겠습니다</td>
         <td>初次見面（敬語）</td>
         <td>처음 뵙겠습니다. 저는 다나카입니다. / 初次見面，我是田中。<br>
-        <button onclick="speak('처음 뵙겠습니다')">🔊 單字</button>
-        <button onclick="speak('처음 뵙겠습니다. 저는 다나카입니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('처음 뵙겠습니다')">🔊 單字</button>
+          <button class="btn" onclick="speak('처음 뵙겠습니다. 저는 다나카입니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>~에서 왔습니다</td>
         <td>我從～來的</td>
         <td>저는 한국에서 왔습니다. / 我從韓國來。<br>
-        <button onclick="speak('~에서 왔습니다')">🔊 單字</button>
-        <button onclick="speak('저는 한국에서 왔습니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('에서 왔습니다')">🔊 單字</button>
+          <button class="btn" onclick="speak('저는 한국에서 왔습니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>잘 부탁드립니다</td>
         <td>請多多指教</td>
         <td>잘 부탁드립니다. / 請多多指教。<br>
-        <button onclick="speak('잘 부탁드립니다')">🔊 單字</button>
-        <button onclick="speak('잘 부탁드립니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('잘 부탁드립니다')">🔊 單字</button>
+          <button class="btn" onclick="speak('잘 부탁드립니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>실례지만</td>
         <td>不好意思、打擾一下</td>
         <td>실례지만, 성함이 어떻게 되세요? / 不好意思，請問您貴姓？<br>
-        <button onclick="speak('실례지만')">🔊 單字</button>
-        <button onclick="speak('실례지만, 성함이 어떻게 되세요?')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('실례지만')">🔊 單字</button>
+          <button class="btn" onclick="speak('실례지만, 성함이 어떻게 되세요?')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>성함이 어떻게 되세요?</td>
         <td>您貴姓？（敬語）</td>
         <td>성함이 어떻게 되세요? / 您叫什麼名字？<br>
-        <button onclick="speak('성함이 어떻게 되세요?')">🔊 單字</button>
-        <button onclick="speak('성함이 어떻게 되세요?')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('성함이 어떻게 되세요?')">🔊 單字</button>
+          <button class="btn" onclick="speak('성함이 어떻게 되세요?')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>이분은 ~씨입니다</td>
         <td>這位是～先生／小姐</td>
         <td>이분은 야마다 씨입니다. / 這位是山田先生。<br>
-        <button onclick="speak('이분은 ~씨입니다')">🔊 單字</button>
-        <button onclick="speak('이분은 야마다 씨입니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('이분은 씨입니다')">🔊 單字</button>
+          <button class="btn" onclick="speak('이분은 야마다 씨입니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>미국</td>
         <td>美國</td>
         <td>저는 미국에서 왔습니다. / 我從美國來。<br>
-        <button onclick="speak('미국')">🔊 單字</button>
-        <button onclick="speak('저는 미국에서 왔습니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('미국')">🔊 單字</button>
+          <button class="btn" onclick="speak('저는 미국에서 왔습니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>영국</td>
         <td>英國</td>
         <td>저는 영국에서 왔습니다. / 我從英國來。<br>
-        <button onclick="speak('영국')">🔊 單字</button>
-        <button onclick="speak('저는 영국에서 왔습니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('영국')">🔊 單字</button>
+          <button class="btn" onclick="speak('저는 영국에서 왔습니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>인도</td>
         <td>印度</td>
         <td>저는 인도에서 왔습니다. / 我從印度來。<br>
-        <button onclick="speak('인도')">🔊 單字</button>
-        <button onclick="speak('저는 인도에서 왔습니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('인도')">🔊 單字</button>
+          <button class="btn" onclick="speak('저는 인도에서 왔습니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>인도네시아</td>
         <td>印尼</td>
         <td>저는 인도네시아에서 왔습니다. / 我從印尼來。<br>
-        <button onclick="speak('인도네시아')">🔊 單字</button>
-        <button onclick="speak('저는 인도네시아에서 왔습니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('인도네시아')">🔊 單字</button>
+          <button class="btn" onclick="speak('저는 인도네시아에서 왔습니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>한국</td>
         <td>韓國</td>
         <td>저는 한국에서 왔습니다. / 我從韓國來。<br>
-        <button onclick="speak('한국')">🔊 單字</button>
-        <button onclick="speak('저는 한국에서 왔습니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('한국')">🔊 單字</button>
+          <button class="btn" onclick="speak('저는 한국에서 왔습니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>태국</td>
         <td>泰國</td>
         <td>저는 태국에서 왔습니다. / 我從泰國來。<br>
-        <button onclick="speak('태국')">🔊 單字</button>
-        <button onclick="speak('저는 태국에서 왔습니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('태국')">🔊 單字</button>
+          <button class="btn" onclick="speak('저는 태국에서 왔습니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>중국</td>
         <td>中國</td>
         <td>저는 중국에서 왔습니다. / 我從中國來。<br>
-        <button onclick="speak('중국')">🔊 單字</button>
-        <button onclick="speak('저는 중국에서 왔습니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('중국')">🔊 單字</button>
+          <button class="btn" onclick="speak('저는 중국에서 왔습니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>독일</td>
         <td>德國</td>
         <td>저는 독일에서 왔습니다. / 我從德國來。<br>
-        <button onclick="speak('독일')">🔊 單字</button>
-        <button onclick="speak('저는 독일에서 왔습니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('독일')">🔊 單字</button>
+          <button class="btn" onclick="speak('저는 독일에서 왔습니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>일본</td>
         <td>日本</td>
         <td>저는 일본에서 왔습니다. / 我從日本來。<br>
-        <button onclick="speak('일본')">🔊 單字</button>
-        <button onclick="speak('저는 일본에서 왔습니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('일본')">🔊 單字</button>
+          <button class="btn" onclick="speak('저는 일본에서 왔습니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
       <tr>
         <td>브라질</td>
         <td>巴西</td>
         <td>저는 브라질에서 왔습니다. / 我從巴西來。<br>
-        <button onclick="speak('브라질')">🔊 單字</button>
-        <button onclick="speak('저는 브라질에서 왔습니다.')">🔊 例句</button></td>
+          <button class="btn" onclick="speak('브라질')">🔊 單字</button>
+          <button class="btn" onclick="speak('저는 브라질에서 왔습니다.')">🔊 例句</button>
+        </td>
       </tr>
-    
     </tbody>
   </table>
-  <div class="center">
+
+  <div class="flex-center" style="margin-top:1rem">
     <a href="index.html" class="home-link">🔙 回首頁</a>
+    <p class="muted">提示：若無聲，先點「啟動語音」，檢查是否連線藍牙耳機，並確認以 HTTPS 開啟。</p>
   </div>
+
   <script>
-    function speak(text) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'ko-KR';
-      speechSynthesis.speak(utterance);
+    // -----------------------------
+    // iPhone 強化型 TTS + 自動輪播
+    // -----------------------------
+    let koVoice = null;
+    let speechReady = false;
+    let keepAliveTimer = null;
+    let autoStop = false;
+
+    const $status = document.getElementById('status');
+    const $rate = document.getElementById('rate');
+
+    function logStatus(text, ok=true){
+      if(!$status) return;
+      $status.style.color = ok ? '#2b7a0b' : '#b00020';
+      $status.textContent = text;
+      setTimeout(()=>{$status.textContent='';}, 4000);
     }
+
+    function loadVoices(){
+      const voices = speechSynthesis.getVoices?.() || [];
+      koVoice = voices.find(v => (v.lang||'').toLowerCase().startsWith('ko'))
+            || voices.find(v => (v.name||'').toLowerCase().includes('korean'))
+            || null;
+    }
+    if('speechSynthesis' in window){
+      loadVoices();
+      speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
+    function ensureResume(){ try{ speechSynthesis.resume(); }catch(e){} }
+
+    function startKeepAlive(){
+      stopKeepAlive();
+      keepAliveTimer = setInterval(()=>{
+        if (speechSynthesis.speaking) ensureResume();
+      }, 900);
+    }
+    function stopKeepAlive(){ if(keepAliveTimer){ clearInterval(keepAliveTimer); keepAliveTimer=null; } }
+
+    function unlockSpeech(){
+      if(!('speechSynthesis' in window)){
+        alert('此瀏覽器不支援語音朗讀'); return;
+      }
+      speechSynthesis.cancel(); ensureResume();
+      const u = new SpeechSynthesisUtterance('시작');
+      u.lang = 'ko-KR'; if(koVoice) u.voice = koVoice; u.volume = 0;
+      u.onend = ()=>{ speechReady = true; const btn = document.getElementById('unlockTTS'); if(btn){ btn.textContent='✅ 語音已啟動（可播放）'; btn.disabled=true; btn.style.opacity=.7; } logStatus('語音引擎已解鎖'); };
+      speechSynthesis.speak(u);
+    }
+
+    function chunkKorean(text){
+      const t = String(text).trim(); if(!t) return [];
+      const parts = t.split(/([.?!…]|[，、。？！]|\s{2,})/).filter(Boolean);
+      const merged = [];
+      for(let i=0;i<parts.length;i++){
+        const cur = parts[i];
+        if(/[.?!…，、。？！]/.test(cur) && merged.length){ merged[merged.length-1] += cur; }
+        else if(cur.trim()){ merged.push(cur.trim()); }
+      }
+      const result=[]; let buf='';
+      for(const seg of merged){
+        if((buf+' '+seg).length <= 40){ buf = buf ? (buf+' '+seg) : seg; }
+        else{ if(buf) result.push(buf); buf = seg; }
+      }
+      if(buf) result.push(buf); return result;
+    }
+
+    function speak(text){
+      if(!('speechSynthesis' in window)){ alert('此瀏覽器不支援語音朗讀'); return; }
+      if(!speechReady && /iPhone|iPad|iPod/i.test(navigator.userAgent)){
+        alert('請先點「啟動語音」一次'); return;
+      }
+      speechSynthesis.cancel(); ensureResume();
+      const queue = chunkKorean(text); let idx = 0;
+      function playNext(){
+        if(idx >= queue.length){ stopKeepAlive(); return; }
+        const u = new SpeechSynthesisUtterance(queue[idx]);
+        u.lang = 'ko-KR'; if(koVoice) u.voice = koVoice; u.rate = parseFloat($rate?.value || '0.95'); u.pitch = 1.0;
+        u.onstart = ()=> startKeepAlive();
+        u.onend = ()=> { idx++; playNext(); };
+        u.onerror = ()=>{ setTimeout(()=>{ ensureResume(); speechSynthesis.cancel(); setTimeout(()=>speechSynthesis.speak(u),120); },80); };
+        speechSynthesis.speak(u);
+      }
+      playNext();
+    }
+
+    function speakChunks(text){
+      return new Promise((resolve)=>{
+        const parts = chunkKorean(text);
+        let i = 0;
+        function next(){
+          if(i >= parts.length){ stopKeepAlive(); return resolve(); }
+          const u = new SpeechSynthesisUtterance(parts[i]);
+          u.lang = 'ko-KR'; if(koVoice) u.voice = koVoice; u.rate = parseFloat($rate?.value || '0.95');
+          u.onstart = ()=> startKeepAlive();
+          u.onend = ()=> { i++; next(); };
+          u.onerror = ()=> { setTimeout(()=>{ ensureResume(); speechSynthesis.cancel(); setTimeout(()=>speechSynthesis.speak(u),120); },80); };
+          speechSynthesis.speak(u);
+        }
+        next();
+      });
+    }
+
+    function playSequence(arr){
+      if(!('speechSynthesis' in window)) return;
+      if(!speechReady && /iPhone|iPad|iPod/i.test(navigator.userAgent)){
+        alert('請先點「啟動語音」一次'); return;
+      }
+      speechSynthesis.cancel(); ensureResume();
+      const seq = arr.flatMap(t => chunkKorean(t));
+      let i = 0;
+      function next(){
+        if(i >= seq.length){ stopKeepAlive(); return; }
+        const u = new SpeechSynthesisUtterance(seq[i]);
+        u.lang = 'ko-KR'; if(koVoice) u.voice = koVoice; u.rate = parseFloat($rate?.value || '0.95');
+        u.onstart = ()=> startKeepAlive();
+        u.onend = ()=>{ i++; next(); };
+        u.onerror = ()=>{ setTimeout(()=>{ ensureResume(); speechSynthesis.cancel(); setTimeout(()=>speechSynthesis.speak(u),120); },80); };
+        speechSynthesis.speak(u);
+      }
+      next();
+    }
+
+    function playAllLessons(){
+      const rows = document.querySelectorAll('#vocab tbody tr');
+      const seq = [];
+      rows.forEach(tr => {
+        const w = (tr.cells[0]?.textContent||'').trim().replace(/^~/,'');
+        const full = (tr.cells[2]?.textContent||'').trim();
+        const s = (full.split('/')[0]||'').trim();
+        if(w && s) seq.push(w, s);
+      });
+      playSequence(seq);
+    }
+
+    async function autoCarousel(startIndex=0){
+      if(!('speechSynthesis' in window)) return;
+      if(!speechReady && /iPhone|iPad|iPod/i.test(navigator.userAgent)){
+        alert('請先點「啟動語音」一次'); return;
+      }
+      autoStop = false;
+      const rows = document.querySelectorAll('#vocab tbody tr');
+      for(let r=startIndex; r<rows.length; r++){
+        if(autoStop) break;
+        const tr = rows[r];
+        const word = (tr.cells[0]?.textContent||'').trim().replace(/^~/,'');
+        const full = (tr.cells[2]?.textContent||'').trim();
+        const sentence = (full.split('/')[0]||'').trim();
+        if(!word || !sentence) continue;
+        speechSynthesis.cancel(); ensureResume();
+        await speakChunks(word);
+        if(autoStop) break;
+        await new Promise(res=> setTimeout(res, 800)); // 0.8 秒
+        if(autoStop) break;
+        await speakChunks(sentence);
+        if(autoStop) break;
+        await new Promise(res=> setTimeout(res, 800)); // 行與行之間 0.8 秒
+      }
+    }
+
+    function autoCarouselFromRow(startTr){
+      const rows = Array.from(document.querySelectorAll('#vocab tbody tr'));
+      const startIndex = Math.max(0, rows.indexOf(startTr));
+      autoCarousel(startIndex);
+    }
+
+    function stopAll(){ autoStop = true; speechSynthesis.cancel(); stopKeepAlive(); }
+
+    function diag(){
+      if(!('speechSynthesis' in window)){ alert('不支援 speechSynthesis'); return; }
+      const voices = speechSynthesis.getVoices?.()||[];
+      const foundKo = voices.filter(v=> (v.lang||'').toLowerCase().includes('ko') || (v.name||'').toLowerCase().includes('korean'));
+      alert('偵測到語音數：'+voices.length+'\n韓文語音：'+(foundKo.map(v=>v.name+' ['+v.lang+']').join(', ') || '無'));
+    }
+
+    function injectRowPlayButtons(){
+      const rows = document.querySelectorAll('#vocab tbody tr');
+      rows.forEach(tr => {
+        const wordCell = tr.cells[0];
+        const sentenceCell = tr.cells[2];
+        if(!wordCell || !sentenceCell) return;
+        const word = (wordCell.textContent||'').trim().replace(/^[~]/,'').replace(/\s*\/.*$/,'');
+        const full = (sentenceCell.textContent||'').trim();
+        const sentence = (full.split('/')[0]||'').trim();
+        if(sentenceCell.querySelector('.rowPlay')) return;
+        const btn = document.createElement('button');
+        btn.className = 'btn rowPlay';
+        btn.textContent = '▶️ 本行播放（單字→例句）';
+        btn.addEventListener('click', ()=> playSequence([word, sentence]));
+        sentenceCell.appendChild(document.createElement('br'));
+        sentenceCell.appendChild(btn);
+
+        const autoBtn = document.createElement('button');
+        autoBtn.className = 'btn rowPlay';
+        autoBtn.textContent = '🔁 從本行開始輪播';
+        autoBtn.addEventListener('click', ()=> autoCarouselFromRow(tr));
+        sentenceCell.appendChild(autoBtn);
+      });
+    }
+
+    // 綁定
+    document.getElementById('unlockTTS')?.addEventListener('click', unlockSpeech);
+    document.getElementById('playAll')?.addEventListener('click', playAllLessons);
+    document.getElementById('autoRun')?.addEventListener('click', ()=> autoCarousel(0));
+    document.getElementById('stopAll')?.addEventListener('click', stopAll);
+    document.getElementById('diag')?.addEventListener('click', diag);
+    document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') ensureResume(); });
+
+    injectRowPlayButtons();
+
+    // 對外暴露 speak()
+    window.speak = speak;
   </script>
 </body>
 </html>
+
